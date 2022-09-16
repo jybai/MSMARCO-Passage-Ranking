@@ -14,7 +14,7 @@ from collections import Counter
 
 MaxMRRRank = 10
 
-def load_reference_from_stream(f):
+def load_reference_from_stream(f, p_col):
     """Load Reference reference relevant passages
     Args:f (stream): stream to load.
     Returns:qids_to_relevant_passageids (dict): dictionary mapping from query_id (int) to relevant passages (list of ints). 
@@ -28,7 +28,8 @@ def load_reference_from_stream(f):
                 pass
             else:
                 qids_to_relevant_passageids[qid] = []
-            qids_to_relevant_passageids[qid].append(int(l[2]))
+            # qids_to_relevant_passageids[qid].append(int(l[2]))
+            qids_to_relevant_passageids[qid].append(int(l[p_col]))
         except:
             raise IOError('\"%s\" is not valid format' % l)
     return qids_to_relevant_passageids
@@ -38,8 +39,15 @@ def load_reference(path_to_reference):
     Args:path_to_reference (str): path to a file to load.
     Returns:qids_to_relevant_passageids (dict): dictionary mapping from query_id (int) to relevant passages (list of ints). 
     """
+    if 'train' in path_to_reference:
+        p_col = 2
+    elif 'dev' in path_to_reference:
+        p_col = 1
+    else:
+        raise NotImplementedError
+        
     with open(path_to_reference,'r') as f:
-        qids_to_relevant_passageids = load_reference_from_stream(f)
+        qids_to_relevant_passageids = load_reference_from_stream(f, p_col)
     return qids_to_relevant_passageids
 
 def load_candidate_from_stream(f):
